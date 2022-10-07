@@ -4,6 +4,12 @@
 
 Working with Puppeteer and twitter is currently in progress. Will be worked on in a branch, then updated when functional.
 
+Currently have a basic functioning program from this [example](https://javascript.plainenglish.io/how-to-scrape-twitter-data-with-depth-first-recursion-afbd437472b5) which puts the replies of a tweet into a JSON format, including the text body, to function as an API. Working on modifying this to be able to get original tweets from searching a specific keyword, or from looking at a specific public profile.
+
+To run this example program:
+
+``` node twitter\twitter.js ```
+
 ## API
 
 [Twitter API](https://developer.twitter.com/en/docs/twitter-api)
