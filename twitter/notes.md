@@ -8,7 +8,11 @@ Currently have a basic functioning program from this [example](https://javascrip
 
 To run this example program:
 
-``` node twitter\twitter.js ```
+``` node twitter\replies.js ```
+
+We now have a script to get the text from a tweet, to run this use:
+
+``` node twitter\post.js ```
 
 ## API
 

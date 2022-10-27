@@ -189,7 +189,7 @@ async function getSubTweetUrls(page) {
     .filter((i) => i && !page.url().includes(i))
     .map((f) => "https://twitter.com" + f);
 }
-let run = async function (base_url) {
+let runReplies = async function (base_url) {
   let browser = await puppeteer.launch({
     headless: false,
     defaultViewport: null,
@@ -288,4 +288,7 @@ let recursiveCommentsCrawler = async function (
 
   return true;
 };
-run("https://twitter.com/CNN/status/1418355188629393411");
+runReplies("https://twitter.com/CNN/status/1418355188629393411");
+
+
+// export { runReplies };
