@@ -1,3 +1,4 @@
+// Unit tests
 const createServer = require("../server");
 const supertest = require('supertest');
 
@@ -6,26 +7,30 @@ let server = null;
 let app = null;
 
 beforeAll(() => {
-
+  // start server
   app = createServer();
   server = app.listen(8888);
 });
 
 afterAll(() => {
+  // close server
   server.close();
 });
 
+// test to ensure server connection
 test("Test Server", async () => {
-  await supertest(app).get('/').then((res) => {
-    expect(res.statusCode).toBe(200)
+  await supertest(app).get('/').then((response) => {
+    expect(response.statusCode).toBe(200);
+    expect(response.text).toBe("Server Up");
   })
 })
 
 describe("Twitter tests", () => {
+  // Fully valid random twitter link, contains an image
   test("Extract Twitter Valid", async () => {
     const url = 'https://twitter.com/statmuse/status/1585456495541772288';
     const post = {
-      media: [
+      link: [
         'https://pbs.twimg.com/media/FgCsR6yacAIW0CC?format=jpg&name=small'
       ],
       published: '2022-10-27T02:20:59.000Z',
@@ -48,14 +53,15 @@ describe("Twitter tests", () => {
         expect(response.body.site).toBe(post.site);
         expect(response.body.text).toBe(post.text);
         expect(response.body.user).toBe(post.user);
-        expect(response.body.media).toEqual(post.media);
+        expect(response.body.link).toEqual(post.link);
       });
   });
   
-  test("Extract Twitter no text", async () => {
+  // No body text, just a Gif (not much is gathered in this case)
+  test("Extract Twitter no body text", async () => {
     const url = 'https://twitter.com/EmilyPa42700209/status/1623921342298083329';
     const post = {
-      media: [],
+      link: [],
       published: '2023-02-10T05:46:33.000Z',
       error: null,
       site: 'Twitter',
@@ -74,14 +80,15 @@ describe("Twitter tests", () => {
         expect(response.body.site).toBe(post.site);
         expect(response.body.text).toBe(post.text);
         expect(response.body.user).toBe(post.user);
-        expect(response.body.media).toEqual(post.media);
+        expect(response.body.link).toEqual(post.link);
       });
   });
 
+  // Post with a link and image
   test("Extract Twitter with links", async () => {
     const url = 'https://twitter.com/boulderpolice/status/1623088935374299136';
     const post = {
-      media: [
+      link: [
         'https://pbs.twimg.com/media/FoYIDeYaAAANkhs?format=jpg&name=small'
       ],
       published: '2023-02-07T22:38:52.000Z',
@@ -102,18 +109,15 @@ describe("Twitter tests", () => {
         expect(response.body.site).toBe(post.site);
         expect(response.body.text).toBe(post.text);
         expect(response.body.user).toBe(post.user);
-        expect(response.body.media).toEqual(post.media);
+        expect(response.body.link).toEqual(post.link);
       });
   });
 
-  test("Extract multiple twitter posts", async () => {
-    const urls = ['https://twitter.com/ech0bug/status/1623911758623805440',
-                  'https://twitter.com/StonerPhillyFan/status/1623953049839362048',
-                  'https://twitter.com/statmuse/status/1585456495541772288'
-                  ];
-    const posts = [
-      {
-        media: [
+  // post with 2 images
+  test("Twitter post with multiple images", async () => {
+    const url = 'https://twitter.com/ech0bug/status/1623911758623805440'
+    const post = {
+        link: [
           'https://pbs.twimg.com/media/FolLIsEaMAAYIBx?format=jpg&name=360x360',
           'https://pbs.twimg.com/media/FolLIsFagAEVFyt?format=jpg&name=360x360'
         ],
@@ -122,42 +126,25 @@ describe("Twitter tests", () => {
         site: 'Twitter',
         text: 'thank you pierce the veil and paramore for starting off 2023 right',
         user: '@ech0bug',
-        url: 'https://twitter.com/ech0bug/status/1623911758623805440'
-      },
-      {
-        media: [],
-        published: '2023-02-10T07:52:33.000Z',
-        error: null,
-        site: 'Twitter',
-        text: 'The only #NFLHonors I care about is the Eagles winning Super Bowl 57',
-        user: '@StonerPhillyFan',
-        url: 'https://twitter.com/StonerPhillyFan/status/1623953049839362048'
-      },
-      {
-        media: [
-          'https://pbs.twimg.com/media/FgCsR6yacAIW0CC?format=jpg&name=small'
-        ],
-        published: '2022-10-27T02:20:59.000Z',
-        error: null,
-        site: 'Twitter',
-        text: 'Giannis now leads the NBA in scoring with 36.0 PPG on 67.7% shooting.\n' +
-          '\n' +
-          'Good night.',
-        user: '@statmuse',
-        url: 'https://twitter.com/statmuse/status/1585456495541772288'
-      }
-    ];
+        url: url
+      };
   
-    for (let i=0; i < urls.length; i++) {
-    await supertest(app).post("/extract").send({ url: urls[i] })
+    await supertest(app).post("/extract").send({ url: url })
       .expect(200)
       .then((response) => {
-        expect(response.body).toEqual(posts[i])
+        // Check data
+        expect(response.body.url).toBe(post.url);
+        expect(response.body.published).toBe(post.published);
+        expect(response.body.error).toBe(post.error);
+        expect(response.body.site).toBe(post.site);
+        expect(response.body.text).toBe(post.text);
+        expect(response.body.user).toBe(post.user);
+        expect(response.body.link).toEqual(post.link);
       });
-    }
   });
 
   describe("Error Checks", () => {
+    // Link contains "twitter.com" but not "/status/"
     test("Invalid Twitter link", async () => {
       url = "https://twitter.com/";
       await supertest(app).post("/extract").send({ url: url })
@@ -167,7 +154,8 @@ describe("Twitter tests", () => {
       });
     });
   
-    test("Invalid Twitter link past initial", async () => {
+    // Link contains "twitter.com" and "/status/" but leads to an invalid post (such as a deleted post)
+    test("Invalid Twitter link past initial url check", async () => {
       url = "https://twitter.com/status/hebfklawebflaiwbefklawbefthisshouldntwork/";
       await supertest(app).post("/extract").send({ url: url })
         .expect(500)
@@ -180,6 +168,7 @@ describe("Twitter tests", () => {
 
 
 describe("Reddit extraction tests", () => {
+  // Fully valid random reddit post
   test("Extract Reddit Valid", async () => {
     const url = 'https://www.reddit.com/r/redditdev/comments/7u94lj/how_to_get_posts_using_api/';
     const post = {
@@ -189,7 +178,7 @@ describe("Reddit extraction tests", () => {
       site: 'Reddit',
       text: 'I want to implement a node server, which on demand will receive and store the last posts from the subrredit. How to implement? How to get authorized? How to use api?',
       page: 'r/redditdev',
-      links: []
+      link: []
     }
 
     await supertest(app).post("/extract").send({ url: url })
@@ -203,10 +192,11 @@ describe("Reddit extraction tests", () => {
         expect(response.body.site).toBe(post.site);
         expect(response.body.text).toBe(post.text);
         expect(response.body.page).toBe(post.page);
-        expect(response.body.links).toEqual(post.links);
+        expect(response.body.link).toEqual(post.link);
       });
   });
 
+  // Reddit post with no body, only title
   test("Extract Reddit, no body", async() => {
     const url = 'https://www.reddit.com/r/AnimalsBeingBros/comments/10yan5f/this_kitty_has_adopted_a_juvenile_possum_and_lets/';
     const post = {
@@ -216,7 +206,7 @@ describe("Reddit extraction tests", () => {
       site: 'Reddit',
       text: '',
       page: 'r/AnimalsBeingBros',
-      links: []
+      link: []
     }
 
     await supertest(app).post("/extract").send({ url: url })
@@ -230,10 +220,11 @@ describe("Reddit extraction tests", () => {
         expect(response.body.site).toBe(post.site);
         expect(response.body.text).toBe(post.text);
         expect(response.body.page).toBe(post.page);
-        expect(response.body.links).toEqual(post.links);
+        expect(response.body.link).toEqual(post.link);
       });
   })
 
+  // Reddit post with image
   test("Extract reddit with image", async () => {
     const url = 'https://www.reddit.com/r/mildlyinfuriating/comments/10xznr6/my_so_throws_her_daily_contacts_behind_the/'
     const post = {
@@ -241,7 +232,7 @@ describe("Reddit extraction tests", () => {
       title: 'My SO throws her daily contacts behind the headboard of our bed.',
       site: 'Reddit',
       text: '',
-      links: [ 'https://i.redd.it/dd7x7o9li8ha1.jpg' ],
+      link: [ 'https://i.redd.it/dd7x7o9li8ha1.jpg' ],
       url: url,
       page: 'r/mildlyinfuriating'
     };
@@ -257,10 +248,11 @@ describe("Reddit extraction tests", () => {
         expect(response.body.site).toBe(post.site);
         expect(response.body.text).toBe(post.text);
         expect(response.body.page).toBe(post.page);
-        expect(response.body.links).toEqual(post.links);
+        expect(response.body.link).toEqual(post.link);
       });
   });
 
+  // Reddit post with an external link (these are not imbedded in the text)
   test("Reddit with external link", async () => {
     const url = 'https://www.reddit.com/r/worldnews/comments/10y8gm7/russia_illegally_occupying_islands_off_hokkaido/'
     const post = {
@@ -268,7 +260,7 @@ describe("Reddit extraction tests", () => {
       title: 'Russia illegally occupying islands off Hokkaido: Japan',
       site: 'Reddit',
       text: '',
-      links: [ 'https://www.taiwannews.com.tw/en/news/4804940' ],
+      link: [ 'https://www.taiwannews.com.tw/en/news/4804940' ],
       url: url,
       page: 'r/worldnews'
     }
@@ -283,11 +275,12 @@ describe("Reddit extraction tests", () => {
         expect(response.body.site).toBe(post.site);
         expect(response.body.text).toBe(post.text);
         expect(response.body.page).toBe(post.page);
-        expect(response.body.links).toEqual(post.links);
+        expect(response.body.link).toEqual(post.link);
       });
   });
 
   describe("Error Checks", () => {
+    // Contains "reddit.com" but not "/comments/"
     test("Fully Invalid Reddit link", async () => {
       url = "https://www.reddit.com/";
       await supertest(app).post("/extract").send({ url: url })
@@ -297,7 +290,8 @@ describe("Reddit extraction tests", () => {
       });
     });
   
-    test("Invalid Reddit link past initial", async () => {
+    // Contains "reddit.com" and "/comments/" but leads to an invalid post (such as a deleted one)
+    test("Invalid Reddit link past initial url checks", async () => {
       url = "https://www.reddit.com/comments/hebfklawebflaiwbefklawbefthisshouldntwork/";
       await supertest(app).post("/extract").send({ url: url })
         .expect(500)
@@ -309,7 +303,8 @@ describe("Reddit extraction tests", () => {
   });
 });
 
-describe("Extract invalid links", () => {
+describe("Extract invalid link", () => {
+  // Completely unsuported site
   test("Unsupported site", async () => {
     url = "https://www.google.com";
     await supertest(app).post("/extract").send({ url: url })

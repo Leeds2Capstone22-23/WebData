@@ -1,4 +1,6 @@
 // https://javascript.plainenglish.io/how-to-scrape-twitter-data-with-depth-first-recursion-afbd437472b5
+// The link above provides a recursive comment crawler for twitter to gather comment data, which is copied in this file (and likely some minor edits while I was learning)
+// We are not using it currently but I am hesitent to remove it in case we decide this is useful in the future.
 const puppeteer = require("puppeteer-extra");
 var Sentiment = require("sentiment");
 const sentiment = (text) => new Sentiment().analyze(text);
@@ -288,7 +290,4 @@ let recursiveCommentsCrawler = async function (
 
   return true;
 };
-runReplies("https://twitter.com/CNN/status/1418355188629393411");
-
-
-// export { runReplies };
+// runReplies("https://twitter.com/CNN/status/1418355188629393411");
