@@ -98,7 +98,7 @@ const getPost = (async (url, getReplies) => {
     tweet.url = url;
 
     
-    // TODO: handle if get replies = True ......... maybe we won't be doing this
+    // TODO: handle if get replies = True ..... maybe we won't be doing this
 
     await browser.close()
     return tweet

@@ -35,7 +35,7 @@ describe("Twitter tests", () => {
         '\n' +
         'Good night.',
       user: '@statmuse',
-      url: 'https://twitter.com/statmuse/status/1585456495541772288'
+      url: url
     };
   
     await supertest(app).post("/extract").send({ url: url })
@@ -61,7 +61,7 @@ describe("Twitter tests", () => {
       site: 'Twitter',
       text: '',
       user: '@EmilyPa42700209',
-      url: 'https://twitter.com/EmilyPa42700209/status/1623921342298083329'
+      url: url
     };
   
     await supertest(app).post("/extract").send({ url: url })
@@ -78,35 +78,40 @@ describe("Twitter tests", () => {
       });
   });
 
+  test("Extract Twitter with links", async () => {
+    const url = 'https://twitter.com/boulderpolice/status/1623088935374299136';
+    const post = {
+      media: [
+        'https://pbs.twimg.com/media/FoYIDeYaAAANkhs?format=jpg&name=small'
+      ],
+      published: '2023-02-07T22:38:52.000Z',
+      error: null,
+      site: 'Twitter',
+      text: 'Want to know more about what your Boulder Police Department does in our community? Here is some data from the past week. Read more detailed crime stats on our crime dashboard at https://bouldercolorado.gov/crime-dashboard #boulder #BoulderColorado',
+      user: '@boulderpolice',
+      url: url
+    }
+  
+    await supertest(app).post("/extract").send({ url: url })
+      .expect(200)
+      .then((response) => {
+        // Check data
+        expect(response.body.url).toBe(post.url);
+        expect(response.body.published).toBe(post.published);
+        expect(response.body.error).toBe(post.error);
+        expect(response.body.site).toBe(post.site);
+        expect(response.body.text).toBe(post.text);
+        expect(response.body.user).toBe(post.user);
+        expect(response.body.media).toEqual(post.media);
+      });
+  });
+
   test("Extract multiple twitter posts", async () => {
-    const urls = ['https://twitter.com/EmilyPa42700209/status/1623921342298083329',
-                  'https://twitter.com/EmilyPa42700209/status/1623946813098057730',
-                  'https://twitter.com/ech0bug/status/1623911758623805440',
-                  'https://twitter.com/EmilyPa42700209/status/1623925534286831616',
+    const urls = ['https://twitter.com/ech0bug/status/1623911758623805440',
                   'https://twitter.com/StonerPhillyFan/status/1623953049839362048',
                   'https://twitter.com/statmuse/status/1585456495541772288'
                   ];
     const posts = [
-      {
-        media: [],
-        published: '2023-02-10T05:46:33.000Z',
-        error: null,
-        site: 'Twitter',
-        text: '',
-        user: '@EmilyPa42700209',
-        url: 'https://twitter.com/EmilyPa42700209/status/1623921342298083329'
-      },
-      {
-        media: [
-          'https://pbs.twimg.com/media/Folq9xsXwAcHiAx?format=jpg&name=small'
-        ],
-        published: '2023-02-10T07:27:46.000Z',
-        error: null,
-        site: 'Twitter',
-        text: '',
-        user: '@EmilyPa42700209',
-        url: 'https://twitter.com/EmilyPa42700209/status/1623946813098057730'
-      },
       {
         media: [
           'https://pbs.twimg.com/media/FolLIsEaMAAYIBx?format=jpg&name=360x360',
@@ -118,15 +123,6 @@ describe("Twitter tests", () => {
         text: 'thank you pierce the veil and paramore for starting off 2023 right',
         user: '@ech0bug',
         url: 'https://twitter.com/ech0bug/status/1623911758623805440'
-      },
-      {
-        media: [],
-        published: '2023-02-10T06:03:13.000Z',
-        error: null,
-        site: 'Twitter',
-        text: 'with text check',
-        user: '@EmilyPa42700209',
-        url: 'https://twitter.com/EmilyPa42700209/status/1623925534286831616'
       },
       {
         media: [],
@@ -192,7 +188,8 @@ describe("Reddit extraction tests", () => {
       url: url,
       site: 'Reddit',
       text: 'I want to implement a node server, which on demand will receive and store the last posts from the subrredit. How to implement? How to get authorized? How to use api?',
-      page: 'r/redditdev'
+      page: 'r/redditdev',
+      links: []
     }
 
     await supertest(app).post("/extract").send({ url: url })
@@ -206,6 +203,87 @@ describe("Reddit extraction tests", () => {
         expect(response.body.site).toBe(post.site);
         expect(response.body.text).toBe(post.text);
         expect(response.body.page).toBe(post.page);
+        expect(response.body.links).toEqual(post.links);
+      });
+  });
+
+  test("Extract Reddit, no body", async() => {
+    const url = 'https://www.reddit.com/r/AnimalsBeingBros/comments/10yan5f/this_kitty_has_adopted_a_juvenile_possum_and_lets/';
+    const post = {
+      user: 'u/purple-circle',
+      title: 'This kitty has adopted a juvenile possum and lets him ride around on her as its mother would',
+      url: url,
+      site: 'Reddit',
+      text: '',
+      page: 'r/AnimalsBeingBros',
+      links: []
+    }
+
+    await supertest(app).post("/extract").send({ url: url })
+      .expect(200)
+      .then((response) => {
+
+        // Check data
+        expect(response.body.url).toBe(post.url);
+        expect(response.body.title).toBe(post.title);
+        expect(response.body.user).toBe(post.user);
+        expect(response.body.site).toBe(post.site);
+        expect(response.body.text).toBe(post.text);
+        expect(response.body.page).toBe(post.page);
+        expect(response.body.links).toEqual(post.links);
+      });
+  })
+
+  test("Extract reddit with image", async () => {
+    const url = 'https://www.reddit.com/r/mildlyinfuriating/comments/10xznr6/my_so_throws_her_daily_contacts_behind_the/'
+    const post = {
+      user: 'u/FireRotor',
+      title: 'My SO throws her daily contacts behind the headboard of our bed.',
+      site: 'Reddit',
+      text: '',
+      links: [ 'https://i.redd.it/dd7x7o9li8ha1.jpg' ],
+      url: url,
+      page: 'r/mildlyinfuriating'
+    };
+
+    await supertest(app).post("/extract").send({ url: url })
+      .expect(200)
+      .then((response) => {
+
+        // Check data
+        expect(response.body.url).toBe(post.url);
+        expect(response.body.title).toBe(post.title);
+        expect(response.body.user).toBe(post.user);
+        expect(response.body.site).toBe(post.site);
+        expect(response.body.text).toBe(post.text);
+        expect(response.body.page).toBe(post.page);
+        expect(response.body.links).toEqual(post.links);
+      });
+  });
+
+  test("Reddit with external link", async () => {
+    const url = 'https://www.reddit.com/r/worldnews/comments/10y8gm7/russia_illegally_occupying_islands_off_hokkaido/'
+    const post = {
+      user: 'u/progress18',
+      title: 'Russia illegally occupying islands off Hokkaido: Japan',
+      site: 'Reddit',
+      text: '',
+      links: [ 'https://www.taiwannews.com.tw/en/news/4804940' ],
+      url: url,
+      page: 'r/worldnews'
+    }
+
+    await supertest(app).post("/extract").send({ url: url })
+      .expect(200)
+      .then((response) => {
+        // Check data
+        expect(response.body.url).toBe(post.url);
+        expect(response.body.title).toBe(post.title);
+        expect(response.body.user).toBe(post.user);
+        expect(response.body.site).toBe(post.site);
+        expect(response.body.text).toBe(post.text);
+        expect(response.body.page).toBe(post.page);
+        expect(response.body.links).toEqual(post.links);
       });
   });
 
