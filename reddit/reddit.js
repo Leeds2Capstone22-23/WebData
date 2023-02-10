@@ -4,6 +4,7 @@ const puppeteer = require("puppeteer");
 const compileRedditBody = (post) => {
 
     // Baseline content
+    // likely to add a more accurate published date/time at some point
     let content = 'Site: Reddit\n' +
                 'User: ' + post.user + '\n' +
                 'Subreddit: ' + post.page + '\n\n' +

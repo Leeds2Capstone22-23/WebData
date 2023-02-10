@@ -5,6 +5,40 @@
 // Then it was edited to suit our needs
 const puppeteer = require("puppeteer-extra");
 
+// method called to combine twitter post data to document content
+const compileTwitterBody = (post) => {
+
+  // Baseline content
+  // may further edit the time posted format in the future
+  let content = 'Site: Twitter\n' +
+              'User: ' + post.user + '\n' +
+              'Time posted: ' + post.published + '\n';
+
+  // If text exists, include
+  if (!(post.text === '')) {
+      content = content + '\n' + post.text + '\n';
+  }
+
+  // If there are link or links
+  if (post.link.length == 1 ) {
+      content = content + '\nLink: ' + post.link[0] + '\n';
+  } else if (post.link.length > 1 ) {
+      content = content + '\nLinks:\n';
+      for (let i = 0; i < post.link.length; i++) {
+          content = content + post.link[i] + '\n';
+      }
+  }
+
+  // combine to body
+  let body = {
+      site: post.site,
+      url: post.url,
+      content: content
+  }
+
+  return body
+}
+
 // Function to gather twitter data
 // getReplies was intended as a boolean to use for the recursive comment crawler. Currently, always set to false and never called. We may not use this
 const getTwitterPost = (async (url, getReplies) => {
@@ -122,8 +156,13 @@ const getTwitterPost = (async (url, getReplies) => {
     // TODO: handle if get replies = True ..... maybe we won't be doing this
 
     // close puppeteer
-    await browser.close()
-    return tweet
+    await browser.close();
+
+    const body = compileTwitterBody(tweet);
+    // console.log(body)
+    // console.log(body.content)
+
+    return body;
 })
 
 

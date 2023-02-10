@@ -30,30 +30,27 @@ describe("Twitter tests", () => {
   test("Extract Twitter Valid", async () => {
     const url = 'https://twitter.com/statmuse/status/1585456495541772288';
     const post = {
-      link: [
-        'https://pbs.twimg.com/media/FgCsR6yacAIW0CC?format=jpg&name=small'
-      ],
-      published: '2022-10-27T02:20:59.000Z',
-      error: null,
       site: 'Twitter',
-      text: 'Giannis now leads the NBA in scoring with 36.0 PPG on 67.7% shooting.\n' +
+      url: url,
+      content: 'Site: Twitter\n' +
+        'User: @statmuse\n' +
+        'Time posted: 2022-10-27T02:20:59.000Z\n' +
         '\n' +
-        'Good night.',
-      user: '@statmuse',
-      url: url
+        'Giannis now leads the NBA in scoring with 36.0 PPG on 67.7% shooting.\n' +
+        '\n' +
+        'Good night.\n' +
+        '\n' +
+        'Link: https://pbs.twimg.com/media/FgCsR6yacAIW0CC?format=jpg&name=small\n'
     };
   
     await supertest(app).post("/extract").send({ url: url })
       .expect(200)
       .then((response) => {
+
         // Check data
-        expect(response.body.url).toBe(post.url);
-        expect(response.body.published).toBe(post.published);
-        expect(response.body.error).toBe(post.error);
         expect(response.body.site).toBe(post.site);
-        expect(response.body.text).toBe(post.text);
-        expect(response.body.user).toBe(post.user);
-        expect(response.body.link).toEqual(post.link);
+        expect(response.body.url).toBe(post.url);
+        expect(response.body.content).toBe(post.content);
       });
   });
   
@@ -61,26 +58,21 @@ describe("Twitter tests", () => {
   test("Extract Twitter no body text", async () => {
     const url = 'https://twitter.com/EmilyPa42700209/status/1623921342298083329';
     const post = {
-      link: [],
-      published: '2023-02-10T05:46:33.000Z',
-      error: null,
       site: 'Twitter',
-      text: '',
-      user: '@EmilyPa42700209',
-      url: url
+      url: url,
+      content: 'Site: Twitter\n' +
+        'User: @EmilyPa42700209\n' +
+        'Time posted: 2023-02-10T05:46:33.000Z\n'
     };
   
     await supertest(app).post("/extract").send({ url: url })
       .expect(200)
       .then((response) => {
+
         // Check data
-        expect(response.body.url).toBe(post.url);
-        expect(response.body.published).toBe(post.published);
-        expect(response.body.error).toBe(post.error);
         expect(response.body.site).toBe(post.site);
-        expect(response.body.text).toBe(post.text);
-        expect(response.body.user).toBe(post.user);
-        expect(response.body.link).toEqual(post.link);
+        expect(response.body.url).toBe(post.url);
+        expect(response.body.content).toBe(post.content);
       });
   });
 
@@ -88,28 +80,25 @@ describe("Twitter tests", () => {
   test("Extract Twitter with links", async () => {
     const url = 'https://twitter.com/boulderpolice/status/1623088935374299136';
     const post = {
-      link: [
-        'https://pbs.twimg.com/media/FoYIDeYaAAANkhs?format=jpg&name=small'
-      ],
-      published: '2023-02-07T22:38:52.000Z',
-      error: null,
       site: 'Twitter',
-      text: 'Want to know more about what your Boulder Police Department does in our community? Here is some data from the past week. Read more detailed crime stats on our crime dashboard at https://bouldercolorado.gov/crime-dashboard #boulder #BoulderColorado',
-      user: '@boulderpolice',
-      url: url
-    }
+      url: url,
+      content: 'Site: Twitter\n' +
+        'User: @boulderpolice\n' +
+        'Time posted: 2023-02-07T22:38:52.000Z\n' +
+        '\n' +
+        'Want to know more about what your Boulder Police Department does in our community? Here is some data from the past week. Read more detailed crime stats on our crime dashboard at https://bouldercolorado.gov/crime-dashboard #boulder #BoulderColorado\n' +
+        '\n' +
+        'Link: https://pbs.twimg.com/media/FoYIDeYaAAANkhs?format=jpg&name=small\n'
+    };
   
     await supertest(app).post("/extract").send({ url: url })
       .expect(200)
       .then((response) => {
+
         // Check data
-        expect(response.body.url).toBe(post.url);
-        expect(response.body.published).toBe(post.published);
-        expect(response.body.error).toBe(post.error);
         expect(response.body.site).toBe(post.site);
-        expect(response.body.text).toBe(post.text);
-        expect(response.body.user).toBe(post.user);
-        expect(response.body.link).toEqual(post.link);
+        expect(response.body.url).toBe(post.url);
+        expect(response.body.content).toBe(post.content);
       });
   });
 
@@ -117,29 +106,27 @@ describe("Twitter tests", () => {
   test("Twitter post with multiple images", async () => {
     const url = 'https://twitter.com/ech0bug/status/1623911758623805440'
     const post = {
-        link: [
-          'https://pbs.twimg.com/media/FolLIsEaMAAYIBx?format=jpg&name=360x360',
-          'https://pbs.twimg.com/media/FolLIsFagAEVFyt?format=jpg&name=360x360'
-        ],
-        published: '2023-02-10T05:08:28.000Z',
-        error: null,
-        site: 'Twitter',
-        text: 'thank you pierce the veil and paramore for starting off 2023 right',
-        user: '@ech0bug',
-        url: url
-      };
+      site: 'Twitter',
+      url: url,
+      content: 'Site: Twitter\n' +
+        'User: @ech0bug\n' +
+        'Time posted: 2023-02-10T05:08:28.000Z\n' +
+        '\n' +
+        'thank you pierce the veil and paramore for starting off 2023 right\n' +
+        '\n' +
+        'Links:\n' +
+        'https://pbs.twimg.com/media/FolLIsEaMAAYIBx?format=jpg&name=360x360\n' +
+        'https://pbs.twimg.com/media/FolLIsFagAEVFyt?format=jpg&name=360x360\n'
+    };
   
     await supertest(app).post("/extract").send({ url: url })
       .expect(200)
       .then((response) => {
+
         // Check data
-        expect(response.body.url).toBe(post.url);
-        expect(response.body.published).toBe(post.published);
-        expect(response.body.error).toBe(post.error);
         expect(response.body.site).toBe(post.site);
-        expect(response.body.text).toBe(post.text);
-        expect(response.body.user).toBe(post.user);
-        expect(response.body.link).toEqual(post.link);
+        expect(response.body.url).toBe(post.url);
+        expect(response.body.content).toBe(post.content);
       });
   });
 
@@ -173,7 +160,7 @@ describe("Reddit extraction tests", () => {
     const url = 'https://www.reddit.com/r/redditdev/comments/7u94lj/how_to_get_posts_using_api/';
     const post = {
       site: 'Reddit',
-      url: 'https://www.reddit.com/r/redditdev/comments/7u94lj/how_to_get_posts_using_api/',
+      url: url,
       content: 'Site: Reddit\n' +
         'User: u/alex-kozack\n' +
         'Subreddit: r/redditdev\n' +
@@ -199,7 +186,7 @@ describe("Reddit extraction tests", () => {
     const url = 'https://www.reddit.com/r/AnimalsBeingBros/comments/10yan5f/this_kitty_has_adopted_a_juvenile_possum_and_lets/';
     const post = {
       site: 'Reddit',
-      url: 'https://www.reddit.com/r/AnimalsBeingBros/comments/10yan5f/this_kitty_has_adopted_a_juvenile_possum_and_lets/',
+      url: url,
       content: 'Site: Reddit\n' +
         'User: u/purple-circle\n' +
         'Subreddit: r/AnimalsBeingBros\n' +
@@ -223,7 +210,7 @@ describe("Reddit extraction tests", () => {
     const url = 'https://www.reddit.com/r/mildlyinfuriating/comments/10xznr6/my_so_throws_her_daily_contacts_behind_the/'
     const post = {
       site: 'Reddit',
-      url: 'https://www.reddit.com/r/mildlyinfuriating/comments/10xznr6/my_so_throws_her_daily_contacts_behind_the/',
+      url: url,
       content: 'Site: Reddit\n' +
         'User: u/FireRotor\n' +
         'Subreddit: r/mildlyinfuriating\n' +
@@ -249,7 +236,7 @@ describe("Reddit extraction tests", () => {
     const url = 'https://www.reddit.com/r/worldnews/comments/10y8gm7/russia_illegally_occupying_islands_off_hokkaido/'
     const post = {
       site: 'Reddit',
-      url: 'https://www.reddit.com/r/worldnews/comments/10y8gm7/russia_illegally_occupying_islands_off_hokkaido/',
+      url: url,
       content: 'Site: Reddit\n' +
         'User: u/progress18\n' +
         'Subreddit: r/worldnews\n' +
@@ -275,7 +262,7 @@ describe("Reddit extraction tests", () => {
     const url = "https://www.reddit.com/r/BestofRedditorUpdates/comments/10y4jmj/confused_dad_al_parents_please_respond/";
     const post =   {
       site: 'Reddit',
-      url: 'https://www.reddit.com/r/BestofRedditorUpdates/comments/10y4jmj/confused_dad_al_parents_please_respond/',
+      url: url,
       content: 'Site: Reddit\n' +
         'User: u/Iamnotgoodwithnames6\n' +
         'Subreddit: r/BestofRedditorUpdates\n' +
