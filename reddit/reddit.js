@@ -1,5 +1,39 @@
 const puppeteer = require("puppeteer");
 
+// method called to combine reddit post data to document content
+const compileRedditBody = (post) => {
+
+    // Baseline content
+    let content = 'Site: Reddit\n' +
+                'User: ' + post.user + '\n' +
+                'Subreddit: ' + post.page + '\n\n' +
+                'Title: ' + post.title + '\n';
+
+    // If text exists, include
+    if (!(post.text === '')) {
+        content = content + '\n' + post.text + '\n';
+    }
+
+    // If there are link or links
+    if (post.link.length == 1 ) {
+        content = content + '\nLink: ' + post.link[0] + '\n';
+    } else if (post.link.length > 1 ) {
+        content = content + '\nLinks:\n';
+        for (let i = 0; i < post.link.length; i++) {
+            content = content + post.link[i] + '\n';
+        }
+    }
+
+    // combine to body
+    let body = {
+        site: post.site,
+        url: post.url,
+        content: content
+    }
+
+    return body
+}
+
 
 // Pull relevent data from Reddit post
 const getRedditPost = (async (url) => {
@@ -35,7 +69,7 @@ const getRedditPost = (async (url) => {
 
                 let description = '';
                 try {
-                    description = post.querySelector('p').innerText;
+                    description = [...post.querySelectorAll('p')].map((e) => e.innerText).join('\n');
                 } catch(err) { /* Do nothing */}
 
                 // compile found data
@@ -77,8 +111,9 @@ const getRedditPost = (async (url) => {
         throw error;
     });
 
-    // TODO: Compile data into single body to align with document storage
-    return post;
+    // Compile post data to match API data
+    const body = compileRedditBody(post);
+    return body;
 });
 
 // exports
