@@ -1,9 +1,15 @@
+const routes = require("./routes")
+var bodyparser = require('body-parser')
+
 var express = require('express'),
-  app = express(),
-  port = process.env.PORT || 3000;
+  app = express()
+app.use(bodyparser.json())
 
-app.listen(port);
+function createServer() {
+  app.use(express.json());
+  // app.use(bodyparser.urlencoded({extended:false}))
+  app.use("/", routes)
+  return app
+}
 
-console.log('Web REST API started on port ' + port);
-
-module.exports = app;
+module.exports = createServer;

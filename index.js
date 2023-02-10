@@ -1,15 +1,44 @@
-var app = require("./server.js")
 var getPost = require("./twitter/post.js")
+var getRedditPost = require("./reddit/reddit.js")
 
-app.get('/getData/${url}', async function (req, res) {
-    console.log(req.body.url)
-    try {
-        let result = await getPost(req.body.url, false);
-        return res.status(200).json(result);
-    } catch(e) {
-        console.log(e);
-        return res.status(400).json(e)
+
+const home = () => Promise.resolve("Link needed")
+
+const getData = async (url) =>  {
+    if (url.includes("twitter.com")) {
+        if (url.includes("/status/")) {
+            return new Promise(async (resolve, reject) => {
+                await getPost(url, false)
+                .then((data) => {
+                    resolve(data)
+                }).catch((e)=> {
+                    reject(e)
+                })
+            })
+        } else {
+            return Promise.reject({error: "Twitter link is not a post"});
+        }
+    } else if (url.includes("reddit.com")) {
+        if (url.includes("/comments/")) {
+            return new Promise(async (resolve, reject) => {
+                await getRedditPost(url)
+                .then((data) => {
+                    resolve(data)
+                }).catch((e)=> {
+                    reject(e)
+                })
+            })
+        } else {
+            return Promise.reject({error: "Reddit link is not a post"});
+        }
+    } else {
+        return Promise.reject({error: "Invalid link: We don't support this site yet"});
     }
-    // console.log(result)
-    // return result;
-})
+}
+
+
+
+module.exports = {
+    home,
+    getData
+}

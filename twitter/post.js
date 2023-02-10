@@ -1,7 +1,7 @@
 
 const puppeteer = require("puppeteer-extra");
 
-async function getPost(url, getReplies) {
+const getPost = (async (url, getReplies) => {
 
     let browser = await puppeteer.launch({
         headless: true,
@@ -78,7 +78,7 @@ async function getPost(url, getReplies) {
 
     browser.close()
     return tweet
-}
+})
 
 
 
@@ -88,6 +88,6 @@ async function runTest(url) {
 }
 
 
-runTest("https://twitter.com/statmuse/status/1585456495541772288")
+// runTest("https://twitter.com/statmuse/status/1585456495541772288")
 
 module.exports = getPost;
