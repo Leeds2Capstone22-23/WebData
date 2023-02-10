@@ -19,7 +19,7 @@ router.post('/extract', async (req, res) => {
     await index.getData(req.body.url)
         .then((data) => handleResponse(res, data))
         .catch((err) => {
-            console.log(err);
+            // console.log(err);
             handleError(res, err)
         });
 });

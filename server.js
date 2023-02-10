@@ -7,7 +7,7 @@ app.use(bodyparser.json())
 
 function createServer() {
   app.use(express.json());
-  // app.use(bodyparser.urlencoded({extended:false}))
+  app.use(bodyparser.urlencoded({extended:false}))
   app.use("/", routes)
   return app
 }
