@@ -66,11 +66,15 @@ The main limitation of reddit is that we cannot pull an accurate date or time a 
 
 # API 
 
-The API Currently has 2 calls that can be made.
+The API Currently has 3 calls that can be made.
 
 ## Get " \ "
 
 This call is a home call that returns "Server Up" if the server is running. This is to check the server status.
+
+## Get " \sites "
+
+This call returns an array of the sites that we currently have support for. Right now this string needs to be updated manually as we get access to more sites.
 
 ## Post " \extract "
 
@@ -86,7 +90,6 @@ The varying information between sites is compacted so all sites return the same 
 - **content**: The varying site information compacted and formated to a single body, made to be stored in the same way as the documents.
 
 It will then be up to the user of the Tag'n'Bag application to define the name of the document to represent the post.
-
 
 
 # TODOs

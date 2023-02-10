@@ -2,7 +2,10 @@
 const createServer = require("../server");
 const supertest = require('supertest');
 
+// longer timeout since webscraping takes time
 jest.setTimeout(50000)
+
+// define server and app
 let server = null;
 let app = null;
 
@@ -17,13 +20,36 @@ afterAll(() => {
   server.close();
 });
 
-// test to ensure server connection
-test("Test Server", async () => {
-  await supertest(app).get('/').then((response) => {
-    expect(response.statusCode).toBe(200);
-    expect(response.text).toBe("Server Up");
-  })
-})
+describe("Generic Tests", () => {
+  // test to ensure server connection
+  test("Test Server", async () => {
+    await supertest(app).get('/')
+    .expect(200)
+    .then((response) => {
+      expect(response.text).toBe("Server Up");
+    });
+  });
+
+  //
+  test("Check supported sites", async () => {
+    const sites = ['Reddit', 'Twitter'];
+    await supertest(app).get('/sites')
+      .expect(200)
+      .then((response) => {
+        expect(response.body).toEqual(sites);
+    });
+  });
+
+  // Completely unsuported site
+  test("Extract Unsupported site", async () => {
+    url = "https://www.google.com";
+    await supertest(app).post("/extract").send({ url: url })
+      .expect(500)
+      .then((error) => {
+        expect(error.body.error).toBe("Invalid link: We don't support this site yet");
+    });
+  });
+});
 
 describe("Twitter tests", () => {
   // Fully valid random twitter link, contains an image
@@ -372,17 +398,5 @@ describe("Reddit extraction tests", () => {
       });
     });
 
-  });
-});
-
-describe("Extract invalid link", () => {
-  // Completely unsuported site
-  test("Unsupported site", async () => {
-    url = "https://www.google.com";
-    await supertest(app).post("/extract").send({ url: url })
-      .expect(500)
-      .then((error) => {
-        expect(error.body.error).toBe("Invalid link: We don't support this site yet");
-    });
   });
 });

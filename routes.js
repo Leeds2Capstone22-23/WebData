@@ -15,14 +15,20 @@ router.get('/', async (req, res) => {
         .catch(err => handleError(res, err));
 });
 
+router.get('/sites', async(req, res) => {
+    await index.getSites()
+        .then(data => handleResponse(res, data))
+        .catch(err => handleError(res, err));
+});
+
 // universally extract from link
 // NOTE: we have to use post since this is a rest API, and we are unable to pass a URL through a get request. 
 // Since we need a URL to call puppeteer, the simplest solution was to use a POST request.
 router.post('/extract', async (req, res) => {
     // don't ask me why this is here. I had some issues and now I'm afraid to remove it.
-    res.setHeader('Content-Type', 'application/json');
+    // res.setHeader('Content-Type', 'application/json');
 
-    // call index.getData
+    // call index for extract, which is getData
     await index.getData(req.body.url)
         .then((data) => handleResponse(res, data))
         .catch((err) => {
@@ -30,6 +36,7 @@ router.post('/extract', async (req, res) => {
             handleError(res, err)
         });
 });
+
 
 // export router
 module.exports = router;
