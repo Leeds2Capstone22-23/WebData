@@ -93,8 +93,6 @@ It will then be up to the user of the Tag'n'Bag application to define the name o
 
 
 # TODOs
-- Reformat to complete desired API
-- Add call to pull list of currently valid sites.
 - Implement docker to be consistent with the rest of the project
 - Clean up twitter some more
 - Create consistency between files
