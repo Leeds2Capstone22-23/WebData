@@ -5,6 +5,11 @@ var getRedditPost = require("./reddit/reddit.js")
 // Test server
 const home = () => Promise.resolve("Server Up")
 
+const getSites = () => {
+    const sites = ['Reddit', 'Twitter'];
+    return Promise.resolve(sites);
+}
+
 // Universal function to scrape from link
 const getData = async (url) =>  {
     // Check if general link is valid, twitter
@@ -51,5 +56,6 @@ const getData = async (url) =>  {
 // exports
 module.exports = {
     home,
+    getSites,
     getData
 }
